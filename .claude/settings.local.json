@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp *)",
+      "mcp__zread__get_repo_structure",
+      "mcp__zread__read_file",
+      "Bash(uv *)",
+      "Bash(git *)",
+      "Bash(py -3.11 --version)",
+      "Bash(py -3.12 --version)",
+      "Bash(py -3.13 --version)",
+      "Bash(pip *)",
+      "Bash(py *)",
+      "Bash(winget install *)",
+      "Bash(cmd.exe *)",
+      "Bash(export PATH=\"C:/Users/beveph/.local/bin:$PATH\")",
+      "Bash(specify version *)",
+      "Bash(C:/Users/beveph/.local/bin/specify.exe version *)",
+      "Bash(C:/Users/beveph/.local/bin/specify.exe init *)",
+      "Bash(\"C:/Users/beveph/.local/bin/specify.exe\" init *)"
+    ]
+  }
+}
