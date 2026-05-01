@@ -17,7 +17,13 @@
       "Bash(specify version *)",
       "Bash(C:/Users/beveph/.local/bin/specify.exe version *)",
       "Bash(C:/Users/beveph/.local/bin/specify.exe init *)",
-      "Bash(\"C:/Users/beveph/.local/bin/specify.exe\" init *)"
+      "Bash(\"C:/Users/beveph/.local/bin/specify.exe\" init *)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".specify/extensions/git/scripts/powershell/create-new-feature.ps1\" -Json -ShortName \"scaffold-platform\" \"基于Harmness工程的web端图形化使用脚手架项目\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -PathsOnly)",
+      "mcp__web-reader__webReader",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/setup-plan.ps1\" -Json)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)"
     ]
   }
 }

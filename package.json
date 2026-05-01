@@ -1,0 +1,23 @@
+{
+  "name": "spec-scaffold",
+  "version": "0.1.0",
+  "private": true,
+  "description": "基于 Harness Engineering 的 Web 端图形化脚手架平台",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "tsx watch backend/src/main.ts",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test --config frontend/playwright.config.ts",
+    "lint": "npm run lint --prefix backend && npm run lint --prefix frontend",
+    "db:init": "tsx backend/src/db/init.ts"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
