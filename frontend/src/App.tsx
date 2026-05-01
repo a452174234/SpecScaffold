@@ -10,6 +10,7 @@ import { SddFlow } from './pages/SddFlow';
 import { AiWorkspace } from './pages/AiWorkspace';
 import { TaskBoard } from './pages/TaskBoard';
 import { AuditLog } from './pages/AuditLog';
+import { ProjectDetail } from './pages/ProjectDetail';
 
 const App = () => (
   <ConfigProvider locale={zhCN}>
@@ -20,7 +21,7 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/projects/new" element={<ProjectCreate />} />
             <Route path="/projects/import" element={<ProjectImport />} />
-            <Route path="/projects/:id" element={<TaskBoard />} />
+            <Route path="/projects/:id" element={<ProjectDetail />} />
             <Route path="/projects/:id/sdd" element={<SddFlow />} />
             <Route path="/projects/:id/ai" element={<AiWorkspace />} />
             <Route path="/projects/:id/tasks" element={<TaskBoard />} />

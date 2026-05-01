@@ -11,5 +11,4 @@ Thumbs.db
 .idea/
 coverage/
 *.db
-specs/001-scaffold-platform/
 .specify/
