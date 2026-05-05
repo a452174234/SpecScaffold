@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Steps, Button, Input, Typography, Card, Space, message, Spin, Alert, Checkbox, Modal } from 'antd';
-import { DeleteOutlined, RedoOutlined } from '@ant-design/icons';
+import { DeleteOutlined, RedoOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
 import { apiPostSSE, apiGet, apiPost } from '../services/api';
@@ -59,15 +59,59 @@ export function SddFlow() {
   useEffect(() => {
     if (!projectId) return;
     (async () => {
+      let dbHasContent = false;
+
       try {
+        // First try DB status
         const res = await apiGet<{ success: boolean; data: any }>(`/projects/${projectId}/sdd/status`);
         if (res.success && res.data) {
           if (res.data.spec?.status === 'tasked') { setCurrentStep(3); setHighestCompleted(3); }
           else if (res.data.spec?.status === 'planned') { setCurrentStep(2); setHighestCompleted(2); }
           else if (res.data.spec?.status === 'clarified') { setCurrentStep(1); setHighestCompleted(1); }
+
+          // Load content from DB if available
+          if (res.data.spec?.content) {
+            dbHasContent = true;
+            setResults((prev) => ({ ...prev, specify: { content: res.data.spec.content }, clarify: { content: res.data.spec.content } }));
+            setEditedContent((prev) => ({ ...prev, specify: res.data.spec.content, clarify: res.data.spec.content }));
+          }
+          if (res.data.plan?.content) {
+            setResults((prev) => ({ ...prev, plan: { content: res.data.plan.content } }));
+            setEditedContent((prev) => ({ ...prev, plan: res.data.plan.content }));
+          }
         }
       } catch {
-        // status endpoint not available, start fresh
+        // status endpoint not available
+      }
+
+      // Then try scanning existing spec files from project directory (only if DB had nothing)
+      if (dbHasContent) return;
+
+      try {
+        const scanRes = await apiGet<{ success: boolean; data: any }>(`/projects/${projectId}/sdd/scan-existing`);
+        if (scanRes.success && scanRes.data?.hasExistingSpecs) {
+          const { steps, detectedStep } = scanRes.data;
+
+          if (steps.specify) {
+            setResults((prev) => ({ ...prev, specify: steps.specify, clarify: steps.specify }));
+            setEditedContent((prev) => ({ ...prev, specify: steps.specify.content, clarify: steps.specify.content }));
+          }
+          if (steps.plan) {
+            setResults((prev) => ({ ...prev, plan: steps.plan }));
+            setEditedContent((prev) => ({ ...prev, plan: steps.plan.content }));
+          }
+          if (steps.tasks) {
+            setResults((prev) => ({ ...prev, tasks: steps.tasks }));
+            setEditedContent((prev) => ({ ...prev, tasks: steps.tasks.content }));
+          }
+
+          if (detectedStep > 0) {
+            setCurrentStep(detectedStep);
+            setHighestCompleted(detectedStep);
+          }
+        }
+      } catch {
+        // scan endpoint not available
       }
     })();
   }, [projectId]);
@@ -216,6 +260,7 @@ export function SddFlow() {
   // Task card state for US3
   const [taskItems, setTaskItems] = useState<Array<{ id: string; text: string }>>([]);
   const [implementDone, setImplementDone] = useState(false);
+  const [mdViewMode, setMdViewMode] = useState<'preview' | 'edit'>('preview');
 
   useEffect(() => {
     if (results.tasks?.content) {
@@ -346,11 +391,36 @@ export function SddFlow() {
           style={{ marginBottom: 16 }}
         >
           <div data-color-mode="light">
-            <MDEditor
-              value={currentEdited || currentResult.content}
-              onChange={(val) => setEditedContent((prev) => ({ ...prev, [currentStepKey()]: val || '' }))}
-              height={400}
-            />
+            <div style={{ marginBottom: 8, display: 'flex', gap: 8 }}>
+              <Button
+                size="small"
+                type={mdViewMode === 'preview' ? 'primary' : 'default'}
+                icon={<EyeOutlined />}
+                onClick={() => setMdViewMode('preview')}
+              >
+                预览
+              </Button>
+              <Button
+                size="small"
+                type={mdViewMode === 'edit' ? 'primary' : 'default'}
+                icon={<EditOutlined />}
+                onClick={() => setMdViewMode('edit')}
+              >
+                编辑
+              </Button>
+            </div>
+            {mdViewMode === 'preview' ? (
+              <MDEditor.Markdown
+                source={currentEdited || currentResult.content}
+                style={{ padding: 16, minHeight: 200, background: '#fff', borderRadius: 6 }}
+              />
+            ) : (
+              <MDEditor
+                value={currentEdited || currentResult.content}
+                onChange={(val) => setEditedContent((prev) => ({ ...prev, [currentStepKey()]: val || '' }))}
+                height={400}
+              />
+            )}
           </div>
           <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
             <Button

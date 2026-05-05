@@ -221,6 +221,62 @@ export class SddService {
     };
   }
 
+  /**
+   * Scan project directory for existing Spec Kit files and load their contents.
+   * Used for imported projects that already have specs/ directories.
+   */
+  scanExistingSpecs(projectId: string) {
+    const project = this.getProject(projectId);
+    const fs = require('fs');
+    const path = require('path');
+
+    const specsDir = path.join(project.path, 'specs');
+    if (!fs.existsSync(specsDir)) {
+      return { hasExistingSpecs: false, steps: {} };
+    }
+
+    const steps: Record<string, { content: string; filePath: string }> = {};
+
+    // Find feature directory with spec.md
+    const entries = fs.readdirSync(specsDir, { withFileTypes: true });
+    const featureDir = entries.find(
+      (e: any) => e.isDirectory() && fs.existsSync(path.join(specsDir, e.name, 'spec.md')),
+    );
+
+    if (featureDir) {
+      const featurePath = path.join(specsDir, featureDir.name);
+
+      // Read spec.md (specify + clarify result)
+      const specPath = path.join(featurePath, 'spec.md');
+      if (fs.existsSync(specPath)) {
+        steps.specify = { content: fs.readFileSync(specPath, 'utf-8'), filePath: specPath };
+        steps.clarify = { content: fs.readFileSync(specPath, 'utf-8'), filePath: specPath };
+      }
+
+      // Read plan.md (plan result)
+      const planPath = path.join(featurePath, 'plan.md');
+      if (fs.existsSync(planPath)) {
+        steps.plan = { content: fs.readFileSync(planPath, 'utf-8'), filePath: planPath };
+      }
+
+      // Read tasks.md (tasks result)
+      const tasksPath = path.join(featurePath, 'tasks.md');
+      if (fs.existsSync(tasksPath)) {
+        steps.tasks = { content: fs.readFileSync(tasksPath, 'utf-8'), filePath: tasksPath };
+      }
+    }
+
+    const hasExistingSpecs = Object.keys(steps).length > 0;
+
+    // Auto-detect progress level
+    let detectedStep = 0;
+    if (steps.tasks) detectedStep = 3;
+    else if (steps.plan) detectedStep = 2;
+    else if (steps.specify) detectedStep = 1;
+
+    return { hasExistingSpecs, steps, detectedStep };
+  }
+
   async implement(projectId: string) {
     const project = this.getProject(projectId);
     return this.adapter.implement(project.path);

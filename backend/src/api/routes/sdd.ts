@@ -148,6 +148,17 @@ sddRoutes.get('/status', async (c) => {
   }
 });
 
+sddRoutes.get('/scan-existing', async (c) => {
+  try {
+    const projectId = c.req.param('id')!;
+    const service = getService();
+    const result = service.scanExistingSpecs(projectId);
+    return c.json({ success: true, data: result });
+  } catch (err: any) {
+    return c.json({ success: false, error: { code: 'ERROR', message: err.message } }, 400);
+  }
+});
+
 sddRoutes.post('/implement', async (c) => {
   try {
     const projectId = c.req.param('id')!;
