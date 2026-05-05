@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Steps, Button, Input, Typography, Card, Space, message, Spin, Alert, Checkbox, Modal } from 'antd';
-import { DeleteOutlined, RedoOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { DeleteOutlined, RedoOutlined, EditOutlined, EyeOutlined, SplitCellsOutlined, CodeOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
 import { apiPostSSE, apiGet, apiPost } from '../services/api';
@@ -260,7 +260,7 @@ export function SddFlow() {
   // Task card state for US3
   const [taskItems, setTaskItems] = useState<Array<{ id: string; text: string }>>([]);
   const [implementDone, setImplementDone] = useState(false);
-  const [mdViewMode, setMdViewMode] = useState<'preview' | 'edit'>('preview');
+  const [mdViewMode, setMdViewMode] = useState<'preview' | 'split' | 'source'>('preview');
 
   useEffect(() => {
     if (results.tasks?.content) {
@@ -402,24 +402,62 @@ export function SddFlow() {
               </Button>
               <Button
                 size="small"
-                type={mdViewMode === 'edit' ? 'primary' : 'default'}
-                icon={<EditOutlined />}
-                onClick={() => setMdViewMode('edit')}
+                type={mdViewMode === 'split' ? 'primary' : 'default'}
+                icon={<SplitCellsOutlined />}
+                onClick={() => setMdViewMode('split')}
               >
-                编辑
+                分屏
+              </Button>
+              <Button
+                size="small"
+                type={mdViewMode === 'source' ? 'primary' : 'default'}
+                icon={<CodeOutlined />}
+                onClick={() => setMdViewMode('source')}
+              >
+                源代码
               </Button>
             </div>
             {mdViewMode === 'preview' ? (
               <MDEditor.Markdown
                 source={currentEdited || currentResult.content}
-                style={{ padding: 16, minHeight: 200, background: '#fff', borderRadius: 6 }}
+                style={{ padding: 24, minHeight: 200, background: '#fff', borderRadius: 6, border: '1px solid #d9d9d9' }}
               />
+            ) : mdViewMode === 'split' ? (
+              <div style={{ display: 'flex', gap: 1, border: '1px solid #d9d9d9', borderRadius: 6, overflow: 'hidden' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ padding: '4px 12px', background: '#fafafa', borderBottom: '1px solid #d9d9d9', fontSize: 12, color: '#666' }}>源代码</div>
+                  <textarea
+                    value={currentEdited || currentResult.content}
+                    onChange={(e) => setEditedContent((prev) => ({ ...prev, [currentStepKey()]: e.target.value }))}
+                    style={{
+                      width: '100%', minHeight: 400, padding: 12,
+                      border: 'none', outline: 'none', resize: 'vertical',
+                      fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace", fontSize: 13, lineHeight: 1.6,
+                    }}
+                  />
+                </div>
+                <div style={{ width: 1, background: '#d9d9d9' }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ padding: '4px 12px', background: '#fafafa', borderBottom: '1px solid #d9d9d9', fontSize: 12, color: '#666' }}>预览</div>
+                  <MDEditor.Markdown
+                    source={currentEdited || currentResult.content}
+                    style={{ padding: 16, minHeight: 380, background: '#fff' }}
+                  />
+                </div>
+              </div>
             ) : (
-              <MDEditor
-                value={currentEdited || currentResult.content}
-                onChange={(val) => setEditedContent((prev) => ({ ...prev, [currentStepKey()]: val || '' }))}
-                height={400}
-              />
+              <div style={{ border: '1px solid #d9d9d9', borderRadius: 6, overflow: 'hidden' }}>
+                <div style={{ padding: '4px 12px', background: '#fafafa', borderBottom: '1px solid #d9d9d9', fontSize: 12, color: '#666' }}>源代码</div>
+                <textarea
+                  value={currentEdited || currentResult.content}
+                  onChange={(e) => setEditedContent((prev) => ({ ...prev, [currentStepKey()]: e.target.value }))}
+                  style={{
+                    width: '100%', minHeight: 400, padding: 16,
+                    border: 'none', outline: 'none', resize: 'vertical',
+                    fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace", fontSize: 14, lineHeight: 1.6, background: '#fff',
+                  }}
+                />
+              </div>
             )}
           </div>
           <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
