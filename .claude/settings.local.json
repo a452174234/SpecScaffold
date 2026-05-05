@@ -23,7 +23,31 @@
       "mcp__web-reader__webReader",
       "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/setup-plan.ps1\" -Json)",
       "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json)",
-      "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)"
+      "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
+      "Bash(npm install *)",
+      "Bash(npx vitest *)",
+      "Bash(npx tsc *)",
+      "Bash(npx vite *)",
+      "Bash(taskkill //F //FI \"IMAGENAME eq node.exe\" //FI \"MEMUSAGE gt 50000\")",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000/api/health)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "WebSearch",
+      "Bash(powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly)",
+      "Bash(powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/setup-plan.ps1 -Json)",
+      "Bash(powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/check-prerequisites.ps1 -Json)",
+      "Bash(ls -la .e2e-test.db*)",
+      "Bash(ls -la .e2e-test.db-shm)",
+      "Bash(ls -la .e2e-test.db-wal)",
+      "Bash(tasklist)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //F //PID 6944)",
+      "Bash(taskkill //F //PID 11332)",
+      "Bash(rm -f .e2e-test.db .e2e-test.db-shm .e2e-test.db-wal)",
+      "Bash(ls .e2e-test.db*)",
+      "Bash(timeout 60 npx playwright test)",
+      "Bash(echo \"EXIT_CODE=$?\")",
+      "Bash(npx playwright *)"
     ]
   }
 }

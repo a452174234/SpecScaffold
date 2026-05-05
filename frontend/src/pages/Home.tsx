@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Empty, Typography, Card, List, Tag } from 'antd';
+import { Button, Empty, Typography, Card, Tag, Row, Col, Spin } from 'antd';
 import { PlusOutlined, ImportOutlined, FolderOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { apiGet } from '../services/api';
@@ -31,11 +31,13 @@ export function Home() {
       const res = await apiGet<{ success: boolean; data: Project[] }>('/projects');
       if (res.success) setProjects(res.data);
     } catch {
-      // 后端未启动时静默处理
+      console.error('加载项目列表失败');
     } finally {
       setLoading(false);
     }
   }
+
+  if (loading) return <Spin size="large" style={{ display: 'block', margin: '80px auto' }} />;
 
   return (
     <div>
@@ -54,12 +56,9 @@ export function Home() {
       {projects.length === 0 ? (
         <Empty description="暂无项目，请新建或导入项目" />
       ) : (
-        <List
-          loading={loading}
-          grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 3 }}
-          dataSource={projects}
-          renderItem={(project) => (
-            <List.Item>
+        <Row gutter={[16, 16]}>
+          {projects.map((project) => (
+            <Col xs={24} sm={12} md={8} lg={8} key={project.id}>
               <Card
                 hoverable
                 onClick={() => navigate(`/projects/${project.id}`)}
@@ -81,9 +80,9 @@ export function Home() {
                   }
                 />
               </Card>
-            </List.Item>
-          )}
-        />
+            </Col>
+          ))}
+        </Row>
       )}
     </div>
   );

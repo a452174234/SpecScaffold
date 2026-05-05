@@ -10,7 +10,7 @@ function getService() {
 
 aiRoutes.post('/generate-tests', async (c) => {
   try {
-    const projectId = c.req.param('id');
+    const projectId = c.req.param('id')!;
     const { taskId } = await c.req.json();
     if (!taskId) {
       return c.json({ success: false, error: { code: 'VALIDATION_ERROR', message: '任务ID不能为空' } }, 400);
@@ -25,7 +25,7 @@ aiRoutes.post('/generate-tests', async (c) => {
 
 aiRoutes.post('/implement', async (c) => {
   try {
-    const projectId = c.req.param('id');
+    const projectId = c.req.param('id')!;
     const { taskId } = await c.req.json();
     if (!taskId) {
       return c.json({ success: false, error: { code: 'VALIDATION_ERROR', message: '任务ID不能为空' } }, 400);
@@ -40,7 +40,7 @@ aiRoutes.post('/implement', async (c) => {
 
 aiRoutes.post('/run-tests', async (c) => {
   try {
-    const projectId = c.req.param('id');
+    const projectId = c.req.param('id')!;
     const { taskId } = await c.req.json();
     if (!taskId) {
       return c.json({ success: false, error: { code: 'VALIDATION_ERROR', message: '任务ID不能为空' } }, 400);

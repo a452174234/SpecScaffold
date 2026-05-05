@@ -4,7 +4,7 @@ import os from 'os';
 import fs from 'fs';
 
 const DATA_DIR = path.join(os.homedir(), '.spec-scaffold');
-const DB_PATH = path.join(DATA_DIR, 'data.db');
+const DB_PATH = process.env.TEST_DB_PATH || path.join(DATA_DIR, 'data.db');
 
 let db: Database.Database | null = null;
 
@@ -46,6 +46,9 @@ function initTables(database: Database.Database) {
       branch TEXT,
       description TEXT,
       spec_file_path TEXT,
+      content TEXT,
+      session_id TEXT,
+      token_usage TEXT,
       status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft', 'clarified', 'planned', 'tasked')),
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -54,6 +57,9 @@ function initTables(database: Database.Database) {
       spec_id TEXT NOT NULL REFERENCES specs(id),
       plan_file_path TEXT,
       tech_stack TEXT,
+      content TEXT,
+      session_id TEXT,
+      token_usage TEXT,
       status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft', 'approved', 'implementing', 'completed')),
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -70,6 +76,8 @@ function initTables(database: Database.Database) {
       test_file_path TEXT,
       impl_file_path TEXT,
       dependencies TEXT,
+      order_index INTEGER,
+      content TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
     CREATE TABLE IF NOT EXISTS security_policies (

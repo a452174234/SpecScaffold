@@ -6,6 +6,7 @@ import {
   RobotOutlined,
   UnorderedListOutlined,
   AuditOutlined,
+  SafetyCertificateOutlined,
   ArrowLeftOutlined,
   FolderOutlined,
   ImportOutlined,
@@ -53,6 +54,13 @@ const navCards = [
     path: '/audit',
     color: '#fff0f6',
   },
+  {
+    title: '安全策略',
+    desc: '配置项目安全策略和工具权限',
+    icon: <SafetyCertificateOutlined style={{ fontSize: 32, color: '#f5222d' }} />,
+    path: '/security',
+    color: '#fff1f0',
+  },
 ];
 
 export function ProjectDetail() {
@@ -70,14 +78,14 @@ export function ProjectDetail() {
       const res = await apiGet<{ success: boolean; data: Project }>(`/projects/${id}`);
       if (res.success) setProject(res.data);
     } catch {
-      // 静默
+      console.error('加载项目失败');
     } finally {
       setLoading(false);
     }
   }
 
   if (loading) return <Spin size="large" style={{ display: 'block', margin: '80px auto' }} />;
-  if (!project) return <Paragraph>项目不存在</Paragraph>;
+  if (!project) return <Paragraph>加载项目失败，请检查项目是否存在或后端服务是否正常</Paragraph>;
 
   return (
     <div>

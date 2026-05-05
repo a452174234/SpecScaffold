@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Input, Card, Typography, Space, Tag, message } from 'antd';
+import { Button, Input, Card, Typography, Tag, message, Flex } from 'antd';
 import { useParams } from 'react-router-dom';
 import { apiPost } from '../services/api';
 
@@ -16,15 +16,17 @@ export function AiWorkspace() {
     if (!taskId) { message.warning('请输入任务ID'); return; }
     setLoading(true);
     try {
-      const res = await apiPost<{ success: boolean; data: any }>(
+      const res = await apiPost<{ success: boolean; data: any; error?: { message: string } }>(
         `/projects/${projectId}/ai/generate-tests`,
         { taskId },
       );
       if (res.success) {
         setSessionId(res.data.sessionId);
         addOutput(`[测试生成] 任务 ${taskId} - 会话 ${res.data.sessionId}`);
+      } else {
+        message.error(res.error?.message || '生成测试失败');
       }
-    } catch { message.error('生成失败'); }
+    } catch (err: any) { message.error(err.message || '生成失败'); }
     finally { setLoading(false); }
   }
 
@@ -32,14 +34,16 @@ export function AiWorkspace() {
     if (!taskId) { message.warning('请输入任务ID'); return; }
     setLoading(true);
     try {
-      const res = await apiPost<{ success: boolean; data: any }>(
+      const res = await apiPost<{ success: boolean; data: any; error?: { message: string } }>(
         `/projects/${projectId}/ai/implement`,
         { taskId },
       );
       if (res.success) {
         addOutput(`[代码实现] 任务 ${taskId} - 会话 ${res.data.sessionId}`);
+      } else {
+        message.error(res.error?.message || '实现失败');
       }
-    } catch { message.error('实现失败'); }
+    } catch (err: any) { message.error(err.message || '实现失败'); }
     finally { setLoading(false); }
   }
 
@@ -47,14 +51,16 @@ export function AiWorkspace() {
     if (!taskId) { message.warning('请输入任务ID'); return; }
     setLoading(true);
     try {
-      const res = await apiPost<{ success: boolean; data: any }>(
+      const res = await apiPost<{ success: boolean; data: any; error?: { message: string } }>(
         `/projects/${projectId}/ai/run-tests`,
         { taskId },
       );
       if (res.success) {
         addOutput(`[运行测试] 任务 ${taskId} - 会话 ${res.data.sessionId}`);
+      } else {
+        message.error(res.error?.message || '运行测试失败');
       }
-    } catch { message.error('运行失败'); }
+    } catch (err: any) { message.error(err.message || '运行失败'); }
     finally { setLoading(false); }
   }
 
@@ -67,8 +73,8 @@ export function AiWorkspace() {
       <Title level={4}>AI 工作区</Title>
 
       <Card title="任务操作" style={{ marginBottom: 16 }}>
-        <Space direction="vertical" style={{ width: '100%' }}>
-          <Space>
+        <Flex vertical gap="middle" style={{ width: '100%' }}>
+          <Flex gap="small" align="center">
             <Text>任务ID:</Text>
             <Input
               value={taskId}
@@ -76,8 +82,8 @@ export function AiWorkspace() {
               placeholder="例如：T001"
               style={{ width: 200 }}
             />
-          </Space>
-          <Space>
+          </Flex>
+          <Flex gap="small">
             <Button type="primary" loading={loading} onClick={handleGenerateTests}>
               生成测试（Red）
             </Button>
@@ -87,9 +93,9 @@ export function AiWorkspace() {
             <Button loading={loading} onClick={handleRunTests}>
               运行测试
             </Button>
-          </Space>
+          </Flex>
           {sessionId && <Tag color="blue">会话: {sessionId}</Tag>}
-        </Space>
+        </Flex>
       </Card>
 
       <Card title="AI 输出">

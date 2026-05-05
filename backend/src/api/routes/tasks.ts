@@ -9,7 +9,7 @@ function getService() {
 }
 
 taskRoutes.get('/', async (c) => {
-  const projectId = c.req.param('id');
+  const projectId = c.req.param('id')!;
   const service = getService();
   const tasks = service.getTasksByProject(projectId);
   return c.json({ success: true, data: tasks });

@@ -48,7 +48,7 @@ export function TaskBoard() {
       );
       if (res.success) setTasks(res.data);
     } catch {
-      // 静默
+      console.error('加载任务列表失败');
     } finally {
       setLoading(false);
     }

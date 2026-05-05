@@ -2,11 +2,18 @@ export interface SpecifyResult {
   specFilePath: string;
   featureDirectory: string;
   checklistPath: string;
+  content: string;
+  sessionId: string;
+  tokenUsage: { input: number; output: number };
+  exitReason: string;
 }
 
 export interface ClarifyResult {
   specFilePath: string;
   questionsAnswered: number;
+  content: string;
+  sessionId: string;
+  tokenUsage: { input: number; output: number };
 }
 
 export interface PlanResult {
@@ -15,17 +22,25 @@ export interface PlanResult {
   dataModelFilePath: string;
   contractsDirectory: string;
   quickstartFilePath: string;
+  content: string;
+  sessionId: string;
+  tokenUsage: { input: number; output: number };
 }
 
 export interface TasksResult {
   tasksFilePath: string;
   taskCount: number;
+  content: string;
+  sessionId: string;
+  tokenUsage: { input: number; output: number };
 }
 
 export interface ImplementResult {
   completedTasks: number;
   failedTasks: number;
   changedFiles: string[];
+  sessionId: string;
+  tokenUsage: { input: number; output: number };
 }
 
 export interface ISpeckitAdapter {

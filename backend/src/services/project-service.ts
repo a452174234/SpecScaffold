@@ -31,6 +31,8 @@ export class ProjectService {
       this.ensureProjectDir(projectPath);
     }
 
+    this.ensureClaudeSkillsJunction(projectPath);
+
     const insertProject = this.db.prepare(`
       INSERT INTO projects (id, name, path, type, status, created_at, updated_at)
       VALUES (?, ?, ?, ?, 'active', ?, ?)
@@ -105,6 +107,8 @@ export class ProjectService {
 
     transaction();
 
+    this.ensureClaudeSkillsJunction(projectPath);
+
     return (await this.getById(id))!;
   }
 
@@ -137,5 +141,32 @@ export class ProjectService {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
+  }
+
+  private ensureClaudeSkillsJunction(projectPath: string) {
+    const projectClaudeDir = path.join(projectPath, '.claude', 'skills');
+    if (fs.existsSync(projectClaudeDir)) return;
+
+    const platformSkillsDir = path.resolve(process.cwd(), '.claude', 'skills');
+    if (!fs.existsSync(platformSkillsDir)) return;
+
+    const parentDir = path.dirname(projectClaudeDir);
+    if (!fs.existsSync(parentDir)) {
+      fs.mkdirSync(parentDir, { recursive: true });
+    }
+
+    // Try junction/symlink first, fallback to copy
+    try {
+      fs.symlinkSync(platformSkillsDir, projectClaudeDir, 'junction');
+      return;
+    } catch {
+      // symlink/junction not supported (e.g. exFAT), fall through to copy
+    }
+
+    try {
+      fs.cpSync(platformSkillsDir, projectClaudeDir, { recursive: true });
+    } catch {
+      // copy also failed, best-effort
+    }
   }
 }

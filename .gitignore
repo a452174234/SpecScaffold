@@ -11,4 +11,7 @@ Thumbs.db
 .idea/
 coverage/
 *.db
+.e2e-test.db
 .specify/
+test-results/
+playwright-report/

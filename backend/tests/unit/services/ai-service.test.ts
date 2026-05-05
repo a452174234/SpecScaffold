@@ -1,14 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { EventEmitter } from 'events';
 import { AiService } from '../../../src/services/ai-service';
 import { getTestDb, cleanTestDb } from '../../setup';
 
-vi.mock('@anthropic-ai/claude-code', () => ({
-  query: vi.fn().mockResolvedValue({
-    sessionId: 'test-session',
-    messages: [],
-    tokenUsage: { input: 50, output: 100 },
-    exitReason: 'completed',
-  }),
+class MockWritable extends EventEmitter {
+  write = vi.fn();
+  end = vi.fn();
+}
+
+class MockChildProcess extends EventEmitter {
+  stdout = new EventEmitter();
+  stderr = new EventEmitter();
+  stdin = new MockWritable();
+}
+
+const mockSpawn = vi.fn();
+
+vi.mock('child_process', () => ({
+  spawn: (...args: unknown[]) => mockSpawn(...args),
+  execFile: vi.fn(),
 }));
 
 describe('AiService', () => {
@@ -22,6 +32,21 @@ describe('AiService', () => {
       "INSERT INTO projects (id, name, path, type, status, created_at, updated_at) VALUES (?, ?, ?, 'created', 'active', datetime('now'), datetime('now'))",
     ).run(projectId, 'AI测试项目', '/tmp/ai-test');
     service = new AiService(db);
+
+    const proc = new MockChildProcess();
+    mockSpawn.mockReturnValue(proc);
+
+    setTimeout(() => {
+      const json = JSON.stringify({
+        type: 'result',
+        session_id: 'test-session',
+        is_error: false,
+        terminal_reason: 'completed',
+        usage: { input_tokens: 50, output_tokens: 100 },
+      });
+      proc.stdout.emit('data', Buffer.from(json));
+      proc.emit('close', 0);
+    }, 10);
   });
 
   it('应启动测试用例生成', async () => {

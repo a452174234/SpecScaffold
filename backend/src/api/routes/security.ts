@@ -9,7 +9,7 @@ function getService() {
 }
 
 securityRoutes.get('/policy', async (c) => {
-  const projectId = c.req.param('id');
+  const projectId = c.req.param('id')!;
   const service = getService();
   const policy = service.policy.get(projectId);
   if (!policy) {
@@ -19,7 +19,7 @@ securityRoutes.get('/policy', async (c) => {
 });
 
 securityRoutes.put('/policy', async (c) => {
-  const projectId = c.req.param('id');
+  const projectId = c.req.param('id')!;
   const body = await c.req.json();
   const service = getService();
   const updated = service.policy.update(projectId, body);
@@ -30,8 +30,8 @@ securityRoutes.put('/policy', async (c) => {
 });
 
 securityRoutes.get('/audit-logs', async (c) => {
-  const projectId = c.req.param('id');
-  const sessionId = c.req.query('sessionId');
+  const projectId = c.req.param('id')!;
+  const sessionId = c.req.query('sessionId') ?? undefined;
   const limit = c.req.query('limit') ? parseInt(c.req.query('limit')!) : 50;
   const service = getService();
   const logs = service.audit.query({ projectId, sessionId, limit });

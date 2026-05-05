@@ -11,6 +11,7 @@ import { AiWorkspace } from './pages/AiWorkspace';
 import { TaskBoard } from './pages/TaskBoard';
 import { AuditLog } from './pages/AuditLog';
 import { ProjectDetail } from './pages/ProjectDetail';
+import { SecurityPolicy } from './pages/SecurityPolicy';
 
 const App = () => (
   <ConfigProvider locale={zhCN}>
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/projects/:id/ai" element={<AiWorkspace />} />
             <Route path="/projects/:id/tasks" element={<TaskBoard />} />
             <Route path="/projects/:id/audit" element={<AuditLog />} />
+            <Route path="/projects/:id/security" element={<SecurityPolicy />} />
           </Routes>
         </Layout>
       </BrowserRouter>

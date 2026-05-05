@@ -48,7 +48,7 @@ export function AuditLog() {
       );
       if (res.success) setLogs(res.data);
     } catch {
-      // 静默处理
+      console.error('加载审计日志失败');
     } finally {
       setLoading(false);
     }
